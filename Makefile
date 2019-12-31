@@ -10,6 +10,8 @@ GEN_COCCI_COCCI         ?= ./gen_cocci.cocci
 GEN_C_SP_FLAGS          ?= --in-place
 GEN_COCCI_SP_FLAGS      ?=
 TEST_SP_FLAGS           ?=
+CODEBASE_DIR            ?=
+ADD_COMMENTS            ?=
 ifdef DIR
 FILES                   = $(shell find ${DIR} -name "*.c" | tr '\n' ' ')
 endif
