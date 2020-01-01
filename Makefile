@@ -31,7 +31,7 @@ c: create_dir
 
 cocci:
 	$(SPATCH) --sp-file $(GEN_COCCI_COCCI) $(BUILD_DIR)$(C_FILE) \
-		> $(BUILD_DIR)$(COCCI_FILE) $(GEN_COCCI_SP_FLAGS)
+		$(GEN_COCCI_SP_FLAGS) > $(BUILD_DIR)$(COCCI_FILE)
 
 test:
 	$(SPATCH) --sp-file $(BUILD_DIR)$(COCCI_FILE) \
