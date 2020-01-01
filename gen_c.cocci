@@ -27,12 +27,12 @@ if t in types:
     cocci.include_match(False)
 elif add_comments:
     if codebase_dir:
-	try:
+        try:
             file = p[0].file.split(codebase_dir)[1]
-	except:
-	    file = p[0].file
+        except:
+            file = p[0].file
     else:
-	file = p[0].file
+        file = p[0].file
     comment = "/* " + file + " " + p[0].line + " */"
     coccinelle.cocci_id = "cocci_id" + comment
     types.add(t)
