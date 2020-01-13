@@ -1,20 +1,20 @@
 #!/usr/bin/make
 
-SPATCH                  = spatch
+SPATCH                  ?= spatch
 BUILD_DIR               ?= ./build/
 C_FILE                  ?= output.c
 COCCI_FILE              ?= output.cocci
-C_FILE_TEMPLATE         ?= "cocci_test_suite() {}"
 GEN_C_COCCI             ?= ./gen_c.cocci
 GEN_COCCI_COCCI         ?= ./gen_cocci.cocci
 GEN_C_SP_FLAGS          ?= --in-place
-GEN_COCCI_SP_FLAGS      ?=
-TEST_SP_FLAGS           ?=
-CODEBASE_DIR            ?=
-ADD_COMMENTS            ?=
 ifdef DIR
 FILES                   = $(shell find ${DIR} -name "*.c" | tr '\n' ' ')
 endif
+define C_FILE_TEMPLATE
+cocci_test_suite() {
+}
+endef
+export C_FILE_TEMPLATE
 
 all: create_dir c cocci
 
@@ -23,7 +23,7 @@ clean:
 
 create_dir:
 	mkdir $(BUILD_DIR)
-	echo $(C_FILE_TEMPLATE) > $(BUILD_DIR)$(C_FILE) 2>&1
+	echo "$$C_FILE_TEMPLATE" > $(BUILD_DIR)$(C_FILE) 2>&1
 
 c: create_dir
 	$(SPATCH) --sp-file $(GEN_C_COCCI) $(FILES) \
