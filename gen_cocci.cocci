@@ -1,19 +1,31 @@
 @ initialize:python @
 @@
 
-from collections import defaultdict
 import re
+import logging
+from collections import defaultdict
+
+logging.basicConfig()
+logger = logging.getLogger("gen_cocci")
+logger.setLevel(logging.INFO)
+
 rule_count = 0
 rules = []
+declarations = defaultdict(list)
+
 append_pos = re.compile(r"\bcocci_id\b")
 filter_res = [
     re.compile(r"\]\s*__[a-zA-Z0-9_]*\s*;$"),
     re.compile(r"__[a-zA-Z0-9_]*\s+cocci_id"),
     re.compile(r"__typeof__"),
     re.compile(r"__attribute__"),
-    re.compile(r"__[a-zA-Z0-9_]*\s*\*\s*cocci_id")
+    re.compile(r"__[a-zA-Z0-9_]*\s*\*\s*cocci_id"),
+    re.compile(r"\n\s*cocci_id"),
+    re.compile(r" , [a-zA-Z0-9_]*_t"),
+    re.compile(r"[a-zA-Z0-9_]*_t\s*cocci_id\s*\("),
+    re.compile(r"#define"),
+    re.compile(r"#ifdef")
 ]
-declarations = defaultdict(list)
 
 print("@ initialize:python @")
 print("@@")
@@ -39,6 +51,7 @@ filter = False
 for regex in filter_res:
     if regex.search(d):
         filter = True
+        logger.info("skipping %s on line %s", d, p[0].line)
         break
 if not filter:
     d = append_pos.sub("cocci_id@p", d)
