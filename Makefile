@@ -7,6 +7,8 @@ COCCI_FILE              ?= output.cocci
 GEN_C_COCCI             ?= ./gen_c.cocci
 GEN_COCCI_COCCI         ?= ./gen_cocci.cocci
 GEN_C_SP_FLAGS          ?= --in-place
+HELPER_SCRIPT           ?= helper.sh
+HELPER_CMD              ?= ./$(HELPER_SCRIPT)
 ifdef DIR
 FILES                   = $(shell find ${DIR} -name "*.c" | tr '\n' ' ')
 endif
@@ -16,18 +18,21 @@ cocci_test_suite() {
 endef
 export C_FILE_TEMPLATE
 
-all: create_dir c cocci
+all: create_dir c fix_c_bugs cocci
 
 clean:
 	rm -rf $(BUILD_DIR)
 
 create_dir:
-	mkdir $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)
 	echo "$$C_FILE_TEMPLATE" > $(BUILD_DIR)$(C_FILE) 2>&1
 
 c: create_dir
 	$(SPATCH) --sp-file $(GEN_C_COCCI) $(FILES) \
 		$(BUILD_DIR)$(C_FILE) $(GEN_C_SP_FLAGS)
+
+fix_c_bugs:
+	$(HELPER_CMD) fix_c_bugs $(BUILD_DIR)$(C_FILE)
 
 cocci:
 	$(SPATCH) --sp-file $(GEN_COCCI_COCCI) $(BUILD_DIR)$(C_FILE) \
