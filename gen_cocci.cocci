@@ -27,6 +27,7 @@ filter_res = [
     re.compile(r"#ifdef")
 ]
 
+logger.info("Starting semantic patch generation")
 print("@ initialize:python @")
 print("@@")
 print("from collections import defaultdict")
@@ -51,15 +52,17 @@ filter = False
 for regex in filter_res:
     if regex.search(d):
         filter = True
-        logger.info("skipping %s on line %s", d, p[0].line)
+        logger.info("Skipped %s on line %s", d, p[0].line)
         break
 if not filter:
     d = append_pos.sub("cocci_id@p", d)
     if d not in declarations:
         declarations[d] = []
+        logger.info("Added %s on line %s", d, p[0].line)
     declarations[d].append(p[0].line)
     if p[0].line != p[0].line_end:
         declarations[d].append(p[0].line_end)
+        logger.info("Added line_end %s for declaration %s", d, p[0].line)
 
 
 @ finalize:python @
@@ -93,7 +96,7 @@ print("rules = {rules}".format(rules=str(rules)))
 print("for i in rules:")
 print("    if i not in rule_matches:")
 print("        print(\"FAILED %s: NO MATCHES\" % (str(i)))")
-print("	continue")
+print("        continue")
 print("    elif rule_matches[i]['correct_lines']:")
 print("        if rule_matches[i]['other_lines']:")
 print("            print(\"PASSED %s: CORRECT MATCHES: %s INCORRECT MATCHES: %s\" % (str(i), str(rule_matches[i]['correct_lines']), str(rule_matches[i]['other_lines'])))")
